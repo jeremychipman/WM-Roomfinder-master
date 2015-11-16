@@ -426,6 +426,7 @@
                         <outlet property="myPositionButton" destination="3eq-LI-DcU" id="TId-Ge-2Vk"/>
                         <outlet property="peopleSegment" destination="9A2-C9-auI" id="fdx-zB-Sjm"/>
                         <outlet property="roomButton" destination="DSh-ZI-yFe" id="b8n-kX-7Pw"/>
+                        <outlet property="roomScheduler" destination="p9l-gK-Obk" id="ogC-ED-T9Z"/>
                         <outlet property="searchBar" destination="IMZ-Aa-qZS" id="u5p-zM-75T"/>
                         <outlet property="tableView" destination="QoB-HZ-mBf" id="GHb-sa-cD7"/>
                         <outlet property="timeSegment" destination="jJb-Jz-0RW" id="kqs-JN-Upz"/>

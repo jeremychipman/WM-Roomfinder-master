@@ -20,11 +20,15 @@ let marker3 = GMSMarker()
 class MapViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, GMSMapViewDelegate, GPSPositionerDelegate, IndoorPositionerDelegate, UISearchResultsUpdating, UISearchBarDelegate  {
     
     // MARK: Properties
+  
+    //ROOM SCHEDULER
     
+    @IBOutlet weak var roomScheduler: UIView!
     @IBOutlet weak var peopleSegment: UISegmentedControl!
     @IBOutlet weak var timeSegment: UISegmentedControl!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var roomButton: UIButton!
+    //END ROOM SCHEDULER
     
     @IBOutlet var mapView: GMSMapView!
     @IBOutlet var currentBuildingLabel: UILabel!
