@@ -17,12 +17,7 @@ let marker3 = GMSMarker()
 //var markerfromModal: String?
 
 
-class MapViewController: UIViewController,
-    UITableViewDataSource,
-UITableViewDelegate,
-GMSMapViewDelegate, GPSPositionerDelegate, IndoorPositionerDelegate
-
-{
+class MapViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, GMSMapViewDelegate, GPSPositionerDelegate, IndoorPositionerDelegate, UISearchResultsUpdating, UISearchBarDelegate  {
     
     // MARK: Properties
     
@@ -66,19 +61,26 @@ GMSMapViewDelegate, GPSPositionerDelegate, IndoorPositionerDelegate
     var currentFloor = Floor.Floor1
     var currentViewFloor = Floor.Floor1
     
-    
+
+    //LOCATION SEARCH
     @IBOutlet weak var modalView: UIView!
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var searchBar: UISearchBar!
     
     var locations: [PFObject]!
+    var locationFromModal: PFObject!
+    
+    //END LOCATION SEARCH
+    
+    
     
     // MARK: Functional Methods
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        //INITIALIZING LOCATION SEARCH
         locations = []
         
         var query = PFQuery(className: "rooms")
@@ -92,9 +94,9 @@ GMSMapViewDelegate, GPSPositionerDelegate, IndoorPositionerDelegate
         
         tableView.dataSource = self
         tableView.delegate = self
-        
-        //tableView.rowHeight = UITableViewAutomaticDimension
         tableView.estimatedRowHeight = 120
+        searchBar.delegate = self
+        //END LOCATION SEARCH
         
         initializeGoogleMapView()
         initializeFloorplanImages()
@@ -197,41 +199,82 @@ GMSMapViewDelegate, GPSPositionerDelegate, IndoorPositionerDelegate
         }
         
         let isRoom = location["isRoom"] as! Bool
-        let isAvailable = location["Available_now"] as? Bool
+        let isAvailable = location["Available_now"] as? Int
         let hasCapacity = location["Capacity"] as? Int
+        
+        // Available_now: 1 = available, 0 = not available, -1 = not the kind of place you book (restroom, cafeteria, etc)
         
         if isRoom == true {
             cell.locationTypeImageView.image = UIImage(named: "room icon")
             
-            if isAvailable != nil && isAvailable == true {
+            if isAvailable != nil && isAvailable == 1 {
                 cell.roomAvailabilityLabel.text = "Available Now"
                 cell.roomAvailabilityLabel.textColor = UIColor.greenColor()
-            } else if isAvailable != nil && isAvailable == false {
+                cell.roomAvailabilityLabel.alpha = 1
+            } else if isAvailable != nil && isAvailable == 0 {
                 cell.roomAvailabilityLabel.text = "Not Available"
                 cell.roomAvailabilityLabel.textColor = UIColor.redColor()
+                cell.roomAvailabilityLabel.alpha = 1
+            } else if isAvailable != nil && isAvailable == -1 {
+                cell.roomAvailabilityLabel.alpha = 0
             } else {
                 cell.roomAvailabilityLabel.text = "Availability Unknown"
                 cell.roomAvailabilityLabel.textColor = UIColor.grayColor()
             }
             
             cell.roomCapacityLabel.text = "Capacity: \(location["Capacity"])"
-            cell.roomAvailabilityLabel.alpha = 1
             cell.roomCapacityLabel.alpha = 1
             
         } else {  //if isRoom is false, then we're assuming it's a person. Could there be other types to capture? would we want to return the person's title, if available? any other data for people?
             cell.locationTypeImageView.image = UIImage(named: "person icon")
-            cell.roomAvailabilityLabel.alpha = 0
+            if isAvailable == 0 {
+                cell.roomAvailabilityLabel.text = "In a meeting"
+                cell.roomAvailabilityLabel.textColor = UIColor.redColor()
+                cell.roomAvailabilityLabel.alpha = 1
+            } else {
+                cell.roomAvailabilityLabel.alpha = 0
+            }
             cell.roomCapacityLabel.alpha = 0
         }
-        
         
         return cell
     }
     
     func tableView(tableView: UITableView, didDeselectRowAtIndexPath indexPath: NSIndexPath) {
-        self.performSegueWithIdentifier("seguetoMap" , sender: self)
+        locationFromModal = locations[indexPath.row]
+        //****<need to add marker>
+        //****<need to make modal disappear>
+        
+        // self.performSegueWithIdentifier("seguetoMap" , sender: self)
     }
 
+    // START SEARCH FUNCTIONS
+    
+    
+    func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
+        let searchText = searchBar.text
+        print("Searchbar text: \(searchText)")
+        var query = PFQuery(className: "rooms")
+        if searchText != nil {
+            //            query.whereKey("Room_Name", containsString: searchText, "i")  **this search was case sensitive
+            query.whereKey("Room_Name", matchesRegex: searchText!, modifiers: "i")
+        }
+        query.orderByAscending("Room_Name")
+        query.findObjectsInBackgroundWithBlock { (locations: [PFObject]?, error: NSError?) -> Void in
+            print("SEARCHING")
+            print(locations)
+            self.locations = locations
+            self.tableView.reloadData()
+        }
+        
+    }
+    
+    func updateSearchResultsForSearchController(searchController: UISearchController) {
+        
+    }
+    //END SEARCH FUNCTIONS
+    
+    
     
     private func initializeGoogleMapView() {
         mapView.settings.compassButton = true
