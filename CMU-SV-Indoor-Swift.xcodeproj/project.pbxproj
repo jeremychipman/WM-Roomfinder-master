@@ -32,6 +32,7 @@
 		87FAE4FA1A352FCB0025FD51 /* IndoorPositionerProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87FAE4F91A352FCB0025FD51 /* IndoorPositionerProtocols.swift */; };
 		B95E50651BFA7D6C00133FFA /* SignInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B95E50641BFA7D6C00133FFA /* SignInViewController.swift */; };
 		B95E50671BFA82AC00133FFA /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = B95E50661BFA82AC00133FFA /* Common.swift */; };
+		B95E50691BFA920C00133FFA /* RoomFinderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B95E50681BFA920C00133FFA /* RoomFinderCell.swift */; };
 		C01F8A5C1BF572570029791E /* Bolts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01F8A5A1BF572570029791E /* Bolts.framework */; };
 		C01F8A5D1BF572570029791E /* Parse.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01F8A5B1BF572570029791E /* Parse.framework */; };
 		C01F8A6A1BF5732F0029791E /* Accounts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01F8A5E1BF5732F0029791E /* Accounts.framework */; };
@@ -92,6 +93,7 @@
 		A9113C9A0CB9F5F110205FF9 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		B95E50641BFA7D6C00133FFA /* SignInViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignInViewController.swift; sourceTree = "<group>"; };
 		B95E50661BFA82AC00133FFA /* Common.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Common.swift; sourceTree = "<group>"; };
+		B95E50681BFA920C00133FFA /* RoomFinderCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RoomFinderCell.swift; sourceTree = "<group>"; };
 		C01F8A5A1BF572570029791E /* Bolts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Bolts.framework; sourceTree = "<group>"; };
 		C01F8A5B1BF572570029791E /* Parse.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Parse.framework; sourceTree = "<group>"; };
 		C01F8A5E1BF5732F0029791E /* Accounts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accounts.framework; path = System/Library/Frameworks/Accounts.framework; sourceTree = SDKROOT; };
@@ -197,6 +199,7 @@
 			children = (
 				87BD4AB81A351FD600B07038 /* LaunchScreen.xib */,
 				87BD4ABA1A351FD600B07038 /* Main.storyboard */,
+				B95E50681BFA920C00133FFA /* RoomFinderCell.swift */,
 				B95E50641BFA7D6C00133FFA /* SignInViewController.swift */,
 				C0DD0F281BF58EDD003FA432 /* LocationResultsCell.swift */,
 				C0DD0F2A1BF58F11003FA432 /* LocationFinderViewController.swift */,
@@ -427,6 +430,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B95E50651BFA7D6C00133FFA /* SignInViewController.swift in Sources */,
+				B95E50691BFA920C00133FFA /* RoomFinderCell.swift in Sources */,
 				87BD4A991A351F2F00B07038 /* AppDelegate.swift in Sources */,
 				C0DD0F291BF58EDD003FA432 /* LocationResultsCell.swift in Sources */,
 				87BD4AC71A351FF800B07038 /* MapViewController.swift in Sources */,
