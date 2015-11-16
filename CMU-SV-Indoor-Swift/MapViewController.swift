@@ -243,7 +243,10 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
     func tableView(tableView: UITableView, didDeselectRowAtIndexPath indexPath: NSIndexPath) {
         locationFromModal = locations[indexPath.row]
         //****<need to add marker>
-        //****<need to make modal disappear>
+        //make modal disappear>
+        UIView.animateWithDuration(0.4, animations: {Void in
+            self.modalView.alpha = 0
+        })
         
         // self.performSegueWithIdentifier("seguetoMap" , sender: self)
     }
