@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1A30BC011BF43FF3006D2E9A /* searchModalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A30BC001BF43FF3006D2E9A /* searchModalViewController.swift */; };
+		1A95001E1BFA970E006C36ED /* wm-GMS-marker.png in Resources */ = {isa = PBXBuildFile; fileRef = 1A95001D1BFA970E006C36ED /* wm-GMS-marker.png */; };
 		82C9202FC65109DFD49D2763 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 176800E115BCCE366DF734B8 /* libPods.a */; };
 		87BD4A991A351F2F00B07038 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87BD4A981A351F2F00B07038 /* AppDelegate.swift */; };
 		87BD4AA01A351F2F00B07038 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 87BD4A9F1A351F2F00B07038 /* Images.xcassets */; };
@@ -63,6 +64,7 @@
 /* Begin PBXFileReference section */
 		176800E115BCCE366DF734B8 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		1A30BC001BF43FF3006D2E9A /* searchModalViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = searchModalViewController.swift; sourceTree = "<group>"; };
+		1A95001D1BFA970E006C36ED /* wm-GMS-marker.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "wm-GMS-marker.png"; sourceTree = "<group>"; };
 		87BD4A931A351F2F00B07038 /* CMU-SV-Indoor-Swift.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CMU-SV-Indoor-Swift.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		87BD4A971A351F2F00B07038 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		87BD4A981A351F2F00B07038 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -267,6 +269,7 @@
 			children = (
 				87BD4ACD1A3520B100B07038 /* MyPositionMarker@2x.png */,
 				87BD4ACE1A3520B100B07038 /* MyPositionMarkerLockHeading@2x.png */,
+				1A95001D1BFA970E006C36ED /* wm-GMS-marker.png */,
 			);
 			name = MyPositionMarkers;
 			sourceTree = "<group>";
@@ -333,7 +336,7 @@
 				TargetAttributes = {
 					87BD4A921A351F2F00B07038 = {
 						CreatedOnToolsVersion = 6.1.1;
-						DevelopmentTeam = 26X3HQL2A5;
+						DevelopmentTeam = 6U6EMKEC24;
 					};
 					87BD4AA71A351F2F00B07038 = {
 						CreatedOnToolsVersion = 6.1.1;
@@ -372,6 +375,7 @@
 				87BD4ADA1A3520BB00B07038 /* Search@2x.png in Resources */,
 				87BD4AD81A3520BB00B07038 /* MyPositionLockHeading@2x.png in Resources */,
 				87BD4ACF1A3520B100B07038 /* MyPositionMarker@2x.png in Resources */,
+				1A95001E1BFA970E006C36ED /* wm-GMS-marker.png in Resources */,
 				87BD4AC91A35208300B07038 /* Assets in Resources */,
 				87BD4ABC1A351FD600B07038 /* LaunchScreen.xib in Resources */,
 				87BD4AD61A3520BB00B07038 /* Indoor@2x.png in Resources */,
@@ -574,7 +578,7 @@
 				);
 				INFOPLIST_FILE = "CMU-SV-Indoor-Swift/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "wmtest.com.CMU-SV-Indoor-Swift";
+				PRODUCT_BUNDLE_IDENTIFIER = "wmtest2.com.CMU-SV-Indoor-Swift";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "CMU-SV-Indoor-Swift-Bridging-Header.h";
@@ -597,7 +601,7 @@
 				);
 				INFOPLIST_FILE = "CMU-SV-Indoor-Swift/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "wmtest.com.CMU-SV-Indoor-Swift";
+				PRODUCT_BUNDLE_IDENTIFIER = "wmtest2.com.CMU-SV-Indoor-Swift";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "CMU-SV-Indoor-Swift-Bridging-Header.h";

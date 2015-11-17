@@ -28,6 +28,7 @@ GMSMapViewDelegate, GPSPositionerDelegate, IndoorPositionerDelegate
     
     @IBOutlet weak var peopleSegment: UISegmentedControl!
     @IBOutlet weak var timeSegment: UISegmentedControl!
+    @IBOutlet weak var roomScheduler: UIView!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var roomButton: UIButton!
     
@@ -79,6 +80,8 @@ GMSMapViewDelegate, GPSPositionerDelegate, IndoorPositionerDelegate
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        self.roomScheduler.alpha = 0
+        
         locations = []
         
         var query = PFQuery(className: "rooms")
@@ -127,6 +130,7 @@ GMSMapViewDelegate, GPSPositionerDelegate, IndoorPositionerDelegate
         marker2.position = CLLocationCoordinate2DMake(37.6271279, -122.4243682)
         marker2.title = "Learning Lab"
         marker2.snippet = "Capacity: 45"
+       
         marker2.map = mapView
         
         let marker3 = GMSMarker()
@@ -726,8 +730,9 @@ GMSMapViewDelegate, GPSPositionerDelegate, IndoorPositionerDelegate
         }
         
         
-        
-        
+    @IBAction func roomSchedulerBtn(sender: AnyObject) {
+        self.roomScheduler.alpha = 1
+    }
 
     }
     
