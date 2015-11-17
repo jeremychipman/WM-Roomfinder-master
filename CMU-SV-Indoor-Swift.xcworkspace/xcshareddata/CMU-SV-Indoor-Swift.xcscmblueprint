@@ -11,7 +11,11 @@
   "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "E9B54E3A-74BC-461F-8327-56AA75FAE8BA",
   "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
     "19F9CC529CC6BE36AEF7CF44FF8194DA67064C4C" : "CMU-SV-Indoor-Swift",
+<<<<<<< HEAD
     "FB4C570F2F4902C90C193420DFCD4EDB19C17BDC" : "WM-Roomfinder-master-JC\/",
+=======
+    "FB4C570F2F4902C90C193420DFCD4EDB19C17BDC" : "WM-Roomfinder-master\/",
+>>>>>>> origin/master
     "53A8C487692AC73784A2B1A481CC8ABDE1537A73" : "CMU-SV-Indoor-Swift-master-master\/"
   },
   "DVTSourceControlWorkspaceBlueprintNameKey" : "CMU-SV-Indoor-Swift",
