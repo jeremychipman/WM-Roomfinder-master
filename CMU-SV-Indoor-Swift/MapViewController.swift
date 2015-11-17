@@ -10,11 +10,11 @@ import UIKit
 import Parse
 import Bolts
 
-let marker = GMSMarker()
-let marker1 = GMSMarker()
-let marker2 = GMSMarker()
-let marker3 = GMSMarker()
-//var markerfromModal: String?
+//let marker = GMSMarker()
+//let marker1 = GMSMarker()
+//let marker2 = GMSMarker()
+//let marker3 = GMSMarker()
+//let markerfromModal = GMSMarker()
 
 
 class MapViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, GMSMapViewDelegate, GPSPositionerDelegate, IndoorPositionerDelegate, UISearchResultsUpdating, UISearchBarDelegate  {
@@ -26,9 +26,11 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
     @IBOutlet weak var roomScheduler: UIView!
     @IBOutlet weak var peopleSegment: UISegmentedControl!
     @IBOutlet weak var timeSegment: UISegmentedControl!
-    @IBOutlet weak var roomScheduler: UIView!
+    //@IBOutlet weak var roomScheduler: UIView!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var roomButton: UIButton!
+    var minimumTime: Int!
+    var minimumPeople: Int!
     //END ROOM SCHEDULER
     
     @IBOutlet var mapView: GMSMapView!
@@ -66,7 +68,7 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
     var currentFloor = Floor.Floor1
     var currentViewFloor = Floor.Floor1
     
-
+    //let markerfromModal = GMSMarker()
     //LOCATION SEARCH
     @IBOutlet weak var modalView: UIView!
     
@@ -75,7 +77,8 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
     
     var locations: [PFObject]!
     var locationFromModal: PFObject!
-    
+    //var markerFromModal: GMSMarker!
+    var markerFromModal = GMSMarker()
     //END LOCATION SEARCH
     
     
@@ -85,12 +88,14 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
     override func viewDidLoad() {
         super.viewDidLoad()
         
-<<<<<<< HEAD
+
         self.roomScheduler.alpha = 0
+        minimumTime = 0  
+        minimumPeople = 0
         
-=======
+
         //INITIALIZING LOCATION SEARCH
->>>>>>> origin/master
+
         locations = []
         
         var query = PFQuery(className: "rooms")
@@ -114,46 +119,44 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
         initializeGPSAndIndoorPositioners()
         
         
+        
+        //Hide parse modal
+        self.modalView.alpha = 0
+        
         //
         //let item = tableView.cellForRowAtIndexPath(indexPath)!.textLabel!.text!
         
         
         
-        //Place markers on the GMS overlay
-        marker.opacity = 0
-        marker.position = CLLocationCoordinate2DMake(37.6270541, -122.4246236)
-        marker.title = "Conference Room A"
-        marker.snippet = "Capacity: 50"
-        marker.map = mapView
-        
-        
-        let marker1 = GMSMarker()
-        marker1.opacity = 0
-        marker1.position = CLLocationCoordinate2DMake(37.6269824, -122.4245814)
-        marker1.title = "Conference Room B"
-        marker1.snippet = "Capacity: 75"
-        marker1.map = mapView
-        
-        let marker2 = GMSMarker()
-        marker2.opacity = 0
-        marker2.position = CLLocationCoordinate2DMake(37.6271279, -122.4243682)
-        marker2.title = "Learning Lab"
-        marker2.snippet = "Capacity: 45"
-       
-        marker2.map = mapView
-        
-        let marker3 = GMSMarker()
-        marker3.opacity = 0
-        marker3.position = CLLocationCoordinate2DMake(37.6269601, -122.4244446)
-        marker3.title = "Restroom"
-        marker3.snippet = ""
-        marker3.map = mapView
+//        //Place markers on the GMS overlay
+//        marker.opacity = 0
+//        marker.position = CLLocationCoordinate2DMake(37.6270541, -122.4246236)
+//        marker.title = "Conference Room A"
+//        marker.snippet = "Capacity: 50"
+//        marker.map = mapView
+//        
+//        
+//        
+//        marker1.opacity = 0
+//        marker1.position = CLLocationCoordinate2DMake(37.6269824, -122.4245814)
+//        marker1.title = "Conference Room B"
+//        marker1.snippet = "Capacity: 75"
+//        marker1.map = mapView
+//        
+//    
+//        marker2.opacity = 0
+//        marker2.position = CLLocationCoordinate2DMake(37.6271279, -122.4243682)
+//        marker2.title = "Learning Lab"
+//        marker2.snippet = "Capacity: 45"
+//        marker2.map = mapView
+//        
+//        
+//        marker3.opacity = 0
+//        marker3.position = CLLocationCoordinate2DMake(37.6269601, -122.4244446)
+//        marker3.title = "Restroom"
+//        marker3.snippet = ""
+//        marker3.map = mapView
     }
-    
-    
-    
-    
-    
     
     
 
@@ -169,20 +172,12 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
-        // let cell = tableView.dequeueReusableCellWithIdentifier("LocationResultsCell", forIndexPath: indexPath) as! LocationResultsCell
-        
-        //let cell = tableView.dequeueReusableCellWithIdentifier("cell", forIndexPath: indexPath)
         
         
         
         var cell = tableView.dequeueReusableCellWithIdentifier("LocationResultsCell") as! LocationResultsCell
         
-        
-        //cell.nameLabel.text = self.locations
-        
-        //cell.cellBtn.tag = indexPath.row
-        
-        //cell.cellBtn.addTarget(self, action: "setglobalVariable", forControlEvents: .TouchUpInside)
+    
         
         var location = locations[indexPath.row]
         
@@ -251,9 +246,47 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
         return cell
     }
     
-    func tableView(tableView: UITableView, didDeselectRowAtIndexPath indexPath: NSIndexPath) {
+    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        var longVar: Double!
+        var latVar: Double!
+        
         locationFromModal = locations[indexPath.row]
+        longVar = (locationFromModal["Long"] as? Double!)!
+        latVar = (locationFromModal["Lat"] as? Double!)!
+        
+        print("I clicked the row!!!")
         //****<need to add marker>
+        
+        
+        //Dismiss keyboard on cell selection
+        UIApplication.sharedApplication().sendAction("resignFirstResponder", to:nil, from:nil, forEvent:nil)
+        
+        //Hide room scheduler modal if it's open
+        roomScheduler.alpha = 0
+
+    
+//        
+//        marker.position = (locationFromModal["Long_Lat"] as? CLLocationCoordinate2D!)!
+//        marker.title = "\(locationFromModal["Room_Name"])"
+//        marker.snippet = "Capacity: \(locationFromModal["Capacity"])"
+//        marker.map = mapView
+        
+        
+        
+        markerFromModal.opacity = 1
+        //markerFromModal.position = (locationFromModal["Long_Lat"] as? CLLocationCoordinate2D!)!
+        markerFromModal.position = CLLocationCoordinate2DMake(longVar, latVar)
+        markerFromModal.title = "\(locationFromModal["Room_Name"])"
+        markerFromModal.snippet = "Capacity: \(locationFromModal["Capacity"])"
+        markerFromModal.map = mapView
+        print("\(locationFromModal["Room_Name"])")
+        
+
+
+        
+
+        
+        
         //make modal disappear>
         UIView.animateWithDuration(0.4, animations: {Void in
             self.modalView.alpha = 0
@@ -289,7 +322,49 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
     //END SEARCH FUNCTIONS
     
     
+    //START ROOM FINDER
     
+    @IBAction func peopleSegment(sender: UISegmentedControl) {
+       
+        if peopleSegment.selectedSegmentIndex == 0 {
+            minimumPeople = 4
+        } else if peopleSegment.selectedSegmentIndex == 1 {
+            minimumPeople = 10
+        } else if peopleSegment.selectedSegmentIndex == 2 {
+            minimumPeople = 11
+        }
+    
+    }
+    
+    @IBAction func timeSegmentDidChange(sender: UISegmentedControl) {
+        
+        if timeSegment.selectedSegmentIndex == 0 {
+            minimumTime = 15
+        } else if timeSegment.selectedSegmentIndex == 1 {
+            minimumTime = 30
+        } else if timeSegment.selectedSegmentIndex == 2 {
+            minimumTime = 60
+        } else if timeSegment.selectedSegmentIndex == 3 {
+            minimumTime = 61
+        }
+        
+        
+    }
+    
+    //function to reload search results
+//    var query = PFQuery(className: "rooms")
+//    query.wherekey("Available_Duration", greaterThanOrEqualTo:minimumTime)
+//    query.wherekey("Capacity", greaterThanOrEqualTo:minimumPeople)
+//    query.orderByAscending("Room_Name")
+//    query.findObjectsInBackgroundWithBlock { (locations: [PFObject]?, error: NSError?) -> Void in
+//    print("got the locations")
+//    print(locations)
+//    self.locations = locations
+//    self.tableView.reloadData()
+//    }
+    
+    
+    //START MAP STUFF
     private func initializeGoogleMapView() {
         mapView.settings.compassButton = true
         let camera: GMSCameraPosition = GMSCameraPosition.cameraWithLatitude(INIT_CAM_LAT, longitude: INIT_CAM_LON, zoom: INIT_CAM_ZOOM)
@@ -754,40 +829,26 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
     }
     
     @IBAction func didTapSearchbutton(sender: AnyObject) {
-        //print("Tapped search button")
         
+        //print("Tapped search button")
+        //markerFromModal.map = nil;
+        //marker.map = nil;
         UIView.animateWithDuration(0.3, animations: {
-            self.modalView.alpha = 0.8
+            self.modalView.alpha = 1
             
         })
+        markerFromModal.opacity = 0
 
     }
-
     
-    @IBAction func bckmapBtn(sender: AnyObject) {
-        
-       //let name = tableView.cellForRowAtIndexPath.String.nameLabel
-        
-        
-            marker.opacity = 1
-            marker1.opacity = 0
-            marker2.opacity = 0
-            marker3.opacity = 0
-            UIView.animateWithDuration(0.3, animations: {
-                self.modalView.alpha = 0
-                
-            })
-        
-
-        
-        }
-        
         
     @IBAction func roomSchedulerBtn(sender: AnyObject) {
         self.roomScheduler.alpha = 1
+        
     }
+ 
 
-    }
+}
     
     
 
