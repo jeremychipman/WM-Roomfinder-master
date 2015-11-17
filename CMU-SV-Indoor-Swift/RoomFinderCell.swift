@@ -20,7 +20,7 @@ class RoomFinderCell: UITableViewCell {
     
     @IBOutlet weak var capacityLabel: UILabel!
     
-    @IBOutlet weak var cellButton: UIButton!
+//    @IBOutlet weak var cellButton: UIButton!
 
     
     override func awakeFromNib() {

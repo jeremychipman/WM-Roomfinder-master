@@ -19,7 +19,7 @@ class LocationResultsCell: UITableViewCell {
     @IBOutlet weak var locationTypeImageView: UIImageView!
     
     
-    @IBOutlet weak var cellBtn: UIButton!
+//    @IBOutlet weak var cellBtn: UIButton!
    
     
     

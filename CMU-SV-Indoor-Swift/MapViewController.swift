@@ -31,6 +31,9 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
     @IBOutlet weak var roomButton: UIButton!
     var minimumTime: Int!
     var minimumPeople: Int!
+    var openRooms: [PFObject]!
+//    var openRoomFromModal: PFObject!
+    @IBOutlet weak var openRoomsTable: UITableView!
     //END ROOM SCHEDULER
     
     @IBOutlet var mapView: GMSMapView!
@@ -68,7 +71,6 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
     var currentFloor = Floor.Floor1
     var currentViewFloor = Floor.Floor1
     
-    //let markerfromModal = GMSMarker()
     //LOCATION SEARCH
     @IBOutlet weak var modalView: UIView!
     
@@ -77,7 +79,6 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
     
     var locations: [PFObject]!
     var locationFromModal: PFObject!
-    //var markerFromModal: GMSMarker!
     var markerFromModal = GMSMarker()
     //END LOCATION SEARCH
     
@@ -88,10 +89,30 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
     override func viewDidLoad() {
         super.viewDidLoad()
         
-
-        self.roomScheduler.alpha = 0
+        //ROOM SEARCH
+        roomScheduler.alpha = 0
         minimumTime = 0  
         minimumPeople = 0
+        openRooms = []
+        
+        var queryRooms = PFQuery(className: "rooms")
+        queryRooms.whereKey("isRoom", equalTo: true)
+        queryRooms.whereKey("Available_now", equalTo: 1)
+        queryRooms.orderByAscending("Room_Name")
+        queryRooms.findObjectsInBackgroundWithBlock { (rooms: [PFObject]?, error: NSError?) -> Void in
+            print("got the rooms")
+            print(rooms)
+            self.openRooms = rooms
+            self.openRoomsTable.reloadData()
+        }
+        
+        openRoomsTable.dataSource = self
+        openRoomsTable.delegate = self
+        openRoomsTable.estimatedRowHeight = 100
+        
+
+        
+        //END ROOM SEARCH
         
 
         //INITIALIZING LOCATION SEARCH
@@ -113,6 +134,7 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
         searchBar.delegate = self
         //END LOCATION SEARCH
         
+        
         initializeGoogleMapView()
         initializeFloorplanImages()
         initializePositionMarkersAndCircles()
@@ -123,39 +145,6 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
         //Hide parse modal
         self.modalView.alpha = 0
         
-        //
-        //let item = tableView.cellForRowAtIndexPath(indexPath)!.textLabel!.text!
-        
-        
-        
-//        //Place markers on the GMS overlay
-//        marker.opacity = 0
-//        marker.position = CLLocationCoordinate2DMake(37.6270541, -122.4246236)
-//        marker.title = "Conference Room A"
-//        marker.snippet = "Capacity: 50"
-//        marker.map = mapView
-//        
-//        
-//        
-//        marker1.opacity = 0
-//        marker1.position = CLLocationCoordinate2DMake(37.6269824, -122.4245814)
-//        marker1.title = "Conference Room B"
-//        marker1.snippet = "Capacity: 75"
-//        marker1.map = mapView
-//        
-//    
-//        marker2.opacity = 0
-//        marker2.position = CLLocationCoordinate2DMake(37.6271279, -122.4243682)
-//        marker2.title = "Learning Lab"
-//        marker2.snippet = "Capacity: 45"
-//        marker2.map = mapView
-//        
-//        
-//        marker3.opacity = 0
-//        marker3.position = CLLocationCoordinate2DMake(37.6269601, -122.4244446)
-//        marker3.title = "Restroom"
-//        marker3.snippet = ""
-//        marker3.map = mapView
     }
     
     
@@ -171,14 +160,9 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        
-        
-        
-        
+       
         var cell = tableView.dequeueReusableCellWithIdentifier("LocationResultsCell") as! LocationResultsCell
-        
-    
-        
+                
         var location = locations[indexPath.row]
         
         cell.nameLabel.text = location["Room_Name"] as? String
@@ -187,13 +171,13 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
         let building = location["Building"] as? String
         
         if building == "SB850C" {
-            cell.buildingsAddressLabel.text = "850 Cherry Ave., San Bruno"
+            cell.buildingsAddressLabel.text = "850 Cherry Ave., SB"
         } else if building == "SB860E" {
-            cell.buildingsAddressLabel.text = "860 Elm Ave., San Bruno"
+            cell.buildingsAddressLabel.text = "860 Elm Ave., SB"
         } else if building == "SV850C" {
-            cell.buildingsAddressLabel.text = "850 California Ave., Sunnyvale"
+            cell.buildingsAddressLabel.text = "850 W. California Ave., SV"
         } else if building == "SV850C" {
-            cell.buildingsAddressLabel.text = "840 California Ave., Sunnyvale"
+            cell.buildingsAddressLabel.text = "840 W. California Ave., SV"
         }
         
         let onFloor = location["Floor"] as? Int
@@ -255,22 +239,12 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
         latVar = (locationFromModal["Lat"] as? Double!)!
         
         print("I clicked the row!!!")
-        //****<need to add marker>
-        
         
         //Dismiss keyboard on cell selection
         UIApplication.sharedApplication().sendAction("resignFirstResponder", to:nil, from:nil, forEvent:nil)
         
         //Hide room scheduler modal if it's open
         roomScheduler.alpha = 0
-
-    
-//        
-//        marker.position = (locationFromModal["Long_Lat"] as? CLLocationCoordinate2D!)!
-//        marker.title = "\(locationFromModal["Room_Name"])"
-//        marker.snippet = "Capacity: \(locationFromModal["Capacity"])"
-//        marker.map = mapView
-        
         
         
         markerFromModal.opacity = 1
@@ -280,13 +254,7 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
         markerFromModal.snippet = "Capacity: \(locationFromModal["Capacity"])"
         markerFromModal.map = mapView
         print("\(locationFromModal["Room_Name"])")
-        
-
-
-        
-
-        
-        
+       
         //make modal disappear>
         UIView.animateWithDuration(0.4, animations: {Void in
             self.modalView.alpha = 0
@@ -297,6 +265,13 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
 
     // START SEARCH FUNCTIONS
     
+    @IBAction func didPressBackButton(sender: UIButton) {
+        
+        //make modal disappear>
+        UIView.animateWithDuration(0.4, animations: {Void in
+            self.modalView.alpha = 0
+        })
+    }
     
     func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
         let searchText = searchBar.text
@@ -333,7 +308,7 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
         } else if peopleSegment.selectedSegmentIndex == 2 {
             minimumPeople = 11
         }
-    
+        showOpenRooms()
     }
     
     @IBAction func timeSegmentDidChange(sender: UISegmentedControl) {
@@ -347,22 +322,145 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
         } else if timeSegment.selectedSegmentIndex == 3 {
             minimumTime = 61
         }
-        
+        showOpenRooms()
         
     }
     
-    //function to reload search results
-//    var query = PFQuery(className: "rooms")
-//    query.wherekey("Available_Duration", greaterThanOrEqualTo:minimumTime)
-//    query.wherekey("Capacity", greaterThanOrEqualTo:minimumPeople)
-//    query.orderByAscending("Room_Name")
-//    query.findObjectsInBackgroundWithBlock { (locations: [PFObject]?, error: NSError?) -> Void in
-//    print("got the locations")
-//    print(locations)
-//    self.locations = locations
-//    self.tableView.reloadData()
-//    }
     
+    @IBAction func didTapBackFromRoomFinder(sender: UIButton) {
+        
+        //make modal disappear>
+        UIView.animateWithDuration(0.4, animations: {Void in
+            self.roomScheduler.alpha = 0
+        })
+        
+    }
+    
+    
+    func openRoomsTable(openRoomsTable: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return openRooms.count
+        print("open rooms.count = \(openRooms.count)")
+    }
+    
+    func openRoomsTable(openRoomsTable: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        
+        var cell = openRoomsTable.dequeueReusableCellWithIdentifier("RoomFinderCell") as! RoomFinderCell
+        
+        
+        
+        var openRoom = openRooms[indexPath.row]
+        
+        cell.nameLabel.text = openRoom["Room_Name"] as? String
+        
+        
+        let building = openRoom["Building"] as? String
+        
+        if building == "SB850C" {
+            cell.buildingLabel.text = "850 Cherry Ave., SB"
+        } else if building == "SB860E" {
+            cell.buildingLabel.text = "860 Elm Ave., SB"
+        } else if building == "SV850C" {
+            cell.buildingLabel.text = "850 W. California Ave., SV"
+        } else if building == "SV850C" {
+            cell.buildingLabel.text = "840 W. California Ave., SV"
+        }
+        
+        let onFloor = openRoom["Floor"] as? Int
+        if onFloor != nil {
+            cell.floorLabel.text = "Floor: \(openRoom["Floor"])"
+        } else if onFloor == nil {
+            cell.floorLabel.text = "Floor unknown"
+            cell.floorLabel.textColor = UIColor.lightGrayColor()
+        }
+        
+        let isRoom = openRoom["isRoom"] as! Bool
+        let isAvailable = openRoom["Available_now"] as? Int
+        let hasCapacity = openRoom["Capacity"] as? Int
+        
+        // Available_now: 1 = available, 0 = not available, -1 = not the kind of place you book (restroom, cafeteria, etc)
+        
+        if isRoom == true {
+            
+            if isAvailable != nil && isAvailable == 1 {
+                cell.availabilityLabel.text = "Available Now"
+                cell.availabilityLabel.textColor = UIColor.greenColor()
+                cell.availabilityLabel.alpha = 1
+            } else if isAvailable != nil && isAvailable == 0 {
+                cell.availabilityLabel.text = "Not Available"
+                cell.availabilityLabel.textColor = UIColor.redColor()
+                cell.availabilityLabel.alpha = 1
+            } else if isAvailable != nil && isAvailable == -1 {
+                cell.availabilityLabel.alpha = 0
+            } else {
+                cell.availabilityLabel.text = "Availability Unknown"
+                cell.availabilityLabel.textColor = UIColor.grayColor()
+            }
+            
+            cell.capacityLabel.text = "Capacity: \(openRoom["Capacity"])"
+            cell.capacityLabel.alpha = 1
+            
+        }
+        
+        return cell
+    }
+    
+    func openRoomsTable(openRoomsTable: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        var longVar: Double!
+        var latVar: Double!
+        
+        locationFromModal = openRooms[indexPath.row]
+        longVar = (locationFromModal["Long"] as? Double!)!
+        latVar = (locationFromModal["Lat"] as? Double!)!
+        
+        print("I clicked the row!!!")
+        
+        //Dismiss keyboard on cell selection
+        //UIApplication.sharedApplication().sendAction("resignFirstResponder", to:nil, from:nil, forEvent:nil)
+        
+        //Hide location finder modal if it's open
+        modalView.alpha = 0
+        
+        
+        markerFromModal.opacity = 1
+        //markerFromModal.position = (locationFromModal["Long_Lat"] as? CLLocationCoordinate2D!)!
+        markerFromModal.position = CLLocationCoordinate2DMake(longVar, latVar)
+        markerFromModal.title = "\(locationFromModal["Room_Name"])"
+        markerFromModal.snippet = "Capacity: \(locationFromModal["Capacity"])"
+        markerFromModal.map = mapView
+        print("\(locationFromModal["Room_Name"])")
+        
+        //make modal disappear>
+        UIView.animateWithDuration(0.4, animations: {Void in
+            self.roomScheduler.alpha = 0
+        })
+        
+        // self.performSegueWithIdentifier("seguetoMap" , sender: self)
+    }
+
+
+    
+    
+    
+    //function to reload search results
+    func showOpenRooms() {
+        var query = PFQuery(className: "rooms")
+        query.whereKey("isRoom", equalTo: true)
+        query.whereKey("Available_Duration", greaterThanOrEqualTo: minimumTime )
+        query.whereKey("Capacity", greaterThanOrEqualTo:minimumPeople)
+        query.orderByAscending("Room_Name")
+        query.findObjectsInBackgroundWithBlock { (locations: [PFObject]?, error: NSError?) -> Void in
+            print("got the locations")
+            print(locations)
+            self.locations = locations
+            self.tableView.reloadData()
+        }
+    }
+
+
+    //END ROOM FUNCTIONS
+    
+    
+   
     
     //START MAP STUFF
     private func initializeGoogleMapView() {
@@ -835,6 +933,7 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
         //marker.map = nil;
         UIView.animateWithDuration(0.3, animations: {
             self.modalView.alpha = 1
+            self.roomScheduler.alpha = 0
             
         })
         markerFromModal.opacity = 0
@@ -843,7 +942,13 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
     
         
     @IBAction func roomSchedulerBtn(sender: AnyObject) {
-        self.roomScheduler.alpha = 1
+        
+        UIView.animateWithDuration(0.3, animations: {
+            self.modalView.alpha = 0
+            self.roomScheduler.alpha = 1
+            
+        })
+
         
     }
  

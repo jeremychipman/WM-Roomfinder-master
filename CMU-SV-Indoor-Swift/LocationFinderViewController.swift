@@ -74,9 +74,9 @@ class LocationFinderViewController: UIViewController, UITableViewDataSource, UIT
         
         //cell.nameLabel.text = self.locations
         
-        cell.cellBtn.tag = indexPath.row
-        
-        cell.cellBtn.addTarget(self, action: "setglobalVariable", forControlEvents: .TouchUpInside)
+//        cell.cellBtn.tag = indexPath.row
+//        
+//        cell.cellBtn.addTarget(self, action: "setglobalVariable", forControlEvents: .TouchUpInside)
         
         var location = locations[indexPath.row]
         
