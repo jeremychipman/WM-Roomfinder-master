@@ -43,12 +43,12 @@ class SignInViewController: UIViewController {
     
     func keyboardWillShow(notification: NSNotification!) {
         
-        scrollView.contentOffset.y = 125
+        scrollView.contentOffset.y = 40
         
     }
     func keyboardWillHide(notification: NSNotification!) {
         
-        scrollView.contentOffset.y = -125
+        scrollView.contentOffset.y = -40
         
         // Get the keyboard height and width from the notification
         

@@ -26,13 +26,11 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
     @IBOutlet weak var roomScheduler: UIView!
     @IBOutlet weak var peopleSegment: UISegmentedControl!
     @IBOutlet weak var timeSegment: UISegmentedControl!
-    //@IBOutlet weak var roomScheduler: UIView!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var roomButton: UIButton!
     var minimumTime: Int!
     var minimumPeople: Int!
     var openRooms: [PFObject]!
-//    var openRoomFromModal: PFObject!
     @IBOutlet weak var openRoomsTable: UITableView!
     //END ROOM SCHEDULER
     
@@ -103,11 +101,11 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
             print("got the rooms")
             print(rooms)
             self.openRooms = rooms
-            self.openRoomsTable.reloadData()
+            self.tableView.reloadData()
         }
         
-        openRoomsTable.dataSource = self
-        openRoomsTable.delegate = self
+        tableView.dataSource = self
+        tableView.delegate = self
         openRoomsTable.estimatedRowHeight = 100
         
 
@@ -128,8 +126,8 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
             self.tableView.reloadData()
         }
         
-        tableView.dataSource = self
-        tableView.delegate = self
+//        tableView.dataSource = self
+//        tableView.delegate = self
         tableView.estimatedRowHeight = 120
         searchBar.delegate = self
         //END LOCATION SEARCH
@@ -141,10 +139,6 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
         initializeGPSAndIndoorPositioners()
         
         
-        
-        //Hide parse modal
-        self.modalView.alpha = 0
-        
     }
     
     
@@ -155,14 +149,103 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return locations.count
-        print("locations.count = \(locations.count)")
+        print("checking number of rows")
+        if tableView == openRoomsTable {
+            return openRooms.count
+            print("rooms.count = \(openRooms.count)")
+        } else {
+            return locations.count
+            print("locations.count = \(locations.count)")
+        }
+        
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
        
+        if tableView == openRoomsTable {
+            print("cell for row, table = rooms")
+            return setCopyInRoomFinderCell(indexPath)
+        } else {
+            print("cell for row, table = all locations")
+            return setCopyInLocationCell(indexPath)
+        }
+        
+        //this stuff below will be deleted
+        
+//        var cell = tableView.dequeueReusableCellWithIdentifier("LocationResultsCell") as! LocationResultsCell
+//                
+//        var location = locations[indexPath.row]
+//        
+//        cell.nameLabel.text = location["Room_Name"] as? String
+//        
+//        
+//        let building = location["Building"] as? String
+//        
+//        if building == "SB850C" {
+//            cell.buildingsAddressLabel.text = "850 Cherry Ave., SB"
+//        } else if building == "SB860E" {
+//            cell.buildingsAddressLabel.text = "860 Elm Ave., SB"
+//        } else if building == "SV850C" {
+//            cell.buildingsAddressLabel.text = "850 W. California Ave., SV"
+//        } else if building == "SV850C" {
+//            cell.buildingsAddressLabel.text = "840 W. California Ave., SV"
+//        }
+//        
+//        let onFloor = location["Floor"] as? Int
+//        if onFloor != nil {
+//            cell.floorNumberLabel.text = "Floor: \(location["Floor"])"
+//        } else if onFloor == nil {
+//            cell.floorNumberLabel.text = "Floor unknown"
+//            cell.floorNumberLabel.textColor = UIColor.lightGrayColor()
+//        }
+//        
+//        let isRoom = location["isRoom"] as! Bool
+//        let isAvailable = location["Available_now"] as? Int
+//        let hasCapacity = location["Capacity"] as? Int
+//        
+//        // Available_now: 1 = available, 0 = not available, -1 = not the kind of place you book (restroom, cafeteria, etc)
+//        
+//        if isRoom == true {
+//            cell.locationTypeImageView.image = UIImage(named: "room icon")
+//            
+//            if isAvailable != nil && isAvailable == 1 {
+//                cell.roomAvailabilityLabel.text = "Available Now"
+//                cell.roomAvailabilityLabel.textColor = UIColor.greenColor()
+//                cell.roomAvailabilityLabel.alpha = 1
+//            } else if isAvailable != nil && isAvailable == 0 {
+//                cell.roomAvailabilityLabel.text = "Not Available"
+//                cell.roomAvailabilityLabel.textColor = UIColor.redColor()
+//                cell.roomAvailabilityLabel.alpha = 1
+//            } else if isAvailable != nil && isAvailable == -1 {
+//                cell.roomAvailabilityLabel.alpha = 0
+//            } else {
+//                cell.roomAvailabilityLabel.text = "Availability Unknown"
+//                cell.roomAvailabilityLabel.textColor = UIColor.grayColor()
+//            }
+//            
+//            cell.roomCapacityLabel.text = "Capacity: \(location["Capacity"])"
+//            cell.roomCapacityLabel.alpha = 1
+//            
+//        } else {  //if isRoom is false, then we're assuming it's a person. Could there be other types to capture? would we want to return the person's title, if available? any other data for people?
+//            cell.locationTypeImageView.image = UIImage(named: "person icon")
+//            if isAvailable == 0 {
+//                cell.roomAvailabilityLabel.text = "In a meeting"
+//                cell.roomAvailabilityLabel.textColor = UIColor.redColor()
+//                cell.roomAvailabilityLabel.alpha = 1
+//            } else {
+//                cell.roomAvailabilityLabel.alpha = 0
+//            }
+//            cell.roomCapacityLabel.alpha = 0
+//        }
+//        
+//        return cell
+    }
+    
+    //REFACTOR FOR LOCATION
+    func setCopyInLocationCell (indexPath: NSIndexPath) -> UITableViewCell {
+        
         var cell = tableView.dequeueReusableCellWithIdentifier("LocationResultsCell") as! LocationResultsCell
-                
+        
         var location = locations[indexPath.row]
         
         cell.nameLabel.text = location["Room_Name"] as? String
@@ -228,39 +311,52 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
         }
         
         return cell
+
     }
+    
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         var longVar: Double!
         var latVar: Double!
         
-        locationFromModal = locations[indexPath.row]
+        if tableView == openRoomsTable {
+            locationFromModal = openRooms[indexPath.row]
+        } else {
+            locationFromModal = locations[indexPath.row]
+        }
+        
         longVar = (locationFromModal["Long"] as? Double!)!
         latVar = (locationFromModal["Lat"] as? Double!)!
         
         print("I clicked the row!!!")
         
-        //Dismiss keyboard on cell selection
-        UIApplication.sharedApplication().sendAction("resignFirstResponder", to:nil, from:nil, forEvent:nil)
+        if longVar != nil && latVar != nil {
+            //Dismiss keyboard on cell selection
+            UIApplication.sharedApplication().sendAction("resignFirstResponder", to:nil, from:nil, forEvent:nil)
         
-        //Hide room scheduler modal if it's open
-        roomScheduler.alpha = 0
+            //make modal disappear
+            UIView.animateWithDuration(0.4, animations: {Void in
+                self.modalView.alpha = 0
+                self.roomScheduler.alpha = 0
+            })
+
+            // This is the code to use if we were segueing between view controllers
+            // self.performSegueWithIdentifier("seguetoMap" , sender: self)
         
+            //Set a marker on the map at the selected room location
+            markerFromModal.opacity = 1
+            //markerFromModal.position = (locationFromModal["Long_Lat"] as? CLLocationCoordinate2D!)!
+            markerFromModal.position = CLLocationCoordinate2DMake(longVar, latVar)
+            markerFromModal.title = "\(locationFromModal["Room_Name"])"
+            markerFromModal.snippet = "Capacity: \(locationFromModal["Capacity"])"
+            markerFromModal.map = mapView
+            print("\(locationFromModal["Room_Name"])")
+        } else {
+            print ("Missing Location Data")
+            //<we should launch an alert here>
+        }
         
-        markerFromModal.opacity = 1
-        //markerFromModal.position = (locationFromModal["Long_Lat"] as? CLLocationCoordinate2D!)!
-        markerFromModal.position = CLLocationCoordinate2DMake(longVar, latVar)
-        markerFromModal.title = "\(locationFromModal["Room_Name"])"
-        markerFromModal.snippet = "Capacity: \(locationFromModal["Capacity"])"
-        markerFromModal.map = mapView
-        print("\(locationFromModal["Room_Name"])")
-       
-        //make modal disappear>
-        UIView.animateWithDuration(0.4, animations: {Void in
-            self.modalView.alpha = 0
-        })
-        
-        // self.performSegueWithIdentifier("seguetoMap" , sender: self)
+
     }
 
     // START SEARCH FUNCTIONS
@@ -278,7 +374,6 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
         print("Searchbar text: \(searchText)")
         var query = PFQuery(className: "rooms")
         if searchText != nil {
-            //            query.whereKey("Room_Name", containsString: searchText, "i")  **this search was case sensitive
             query.whereKey("Room_Name", matchesRegex: searchText!, modifiers: "i")
         }
         query.orderByAscending("Room_Name")
@@ -308,6 +403,7 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
         } else if peopleSegment.selectedSegmentIndex == 2 {
             minimumPeople = 11
         }
+        print("changed people seg controller")
         showOpenRooms()
     }
     
@@ -322,6 +418,7 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
         } else if timeSegment.selectedSegmentIndex == 3 {
             minimumTime = 61
         }
+        print("changed time seg controller")
         showOpenRooms()
         
     }
@@ -336,19 +433,13 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
         
     }
     
-    
-    func openRoomsTable(openRoomsTable: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return openRooms.count
-        print("open rooms.count = \(openRooms.count)")
-    }
-    
-    func openRoomsTable(openRoomsTable: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+   
+    func setCopyInRoomFinderCell(indexPath: NSIndexPath) -> UITableViewCell {
         
         var cell = openRoomsTable.dequeueReusableCellWithIdentifier("RoomFinderCell") as! RoomFinderCell
         
-        
-        
         var openRoom = openRooms[indexPath.row]
+        print("DQing openRoomsTable")
         
         cell.nameLabel.text = openRoom["Room_Name"] as? String
         
@@ -404,54 +495,21 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
         return cell
     }
     
-    func openRoomsTable(openRoomsTable: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        var longVar: Double!
-        var latVar: Double!
-        
-        locationFromModal = openRooms[indexPath.row]
-        longVar = (locationFromModal["Long"] as? Double!)!
-        latVar = (locationFromModal["Lat"] as? Double!)!
-        
-        print("I clicked the row!!!")
-        
-        //Dismiss keyboard on cell selection
-        //UIApplication.sharedApplication().sendAction("resignFirstResponder", to:nil, from:nil, forEvent:nil)
-        
-        //Hide location finder modal if it's open
-        modalView.alpha = 0
-        
-        
-        markerFromModal.opacity = 1
-        //markerFromModal.position = (locationFromModal["Long_Lat"] as? CLLocationCoordinate2D!)!
-        markerFromModal.position = CLLocationCoordinate2DMake(longVar, latVar)
-        markerFromModal.title = "\(locationFromModal["Room_Name"])"
-        markerFromModal.snippet = "Capacity: \(locationFromModal["Capacity"])"
-        markerFromModal.map = mapView
-        print("\(locationFromModal["Room_Name"])")
-        
-        //make modal disappear>
-        UIView.animateWithDuration(0.4, animations: {Void in
-            self.roomScheduler.alpha = 0
-        })
-        
-        // self.performSegueWithIdentifier("seguetoMap" , sender: self)
-    }
-
-
-    
+  
     
     
     //function to reload search results
     func showOpenRooms() {
+        print("running function : show open rooms")
         var query = PFQuery(className: "rooms")
         query.whereKey("isRoom", equalTo: true)
         query.whereKey("Available_Duration", greaterThanOrEqualTo: minimumTime )
         query.whereKey("Capacity", greaterThanOrEqualTo:minimumPeople)
         query.orderByAscending("Room_Name")
-        query.findObjectsInBackgroundWithBlock { (locations: [PFObject]?, error: NSError?) -> Void in
-            print("got the locations")
-            print(locations)
-            self.locations = locations
+        query.findObjectsInBackgroundWithBlock { (openRooms: [PFObject]?, error: NSError?) -> Void in
+            print("got the rooms")
+            print(openRooms)
+            self.openRooms = openRooms
             self.tableView.reloadData()
         }
     }
