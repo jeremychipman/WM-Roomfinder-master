@@ -286,7 +286,6 @@
                                         </subviews>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                     </view>
-<<<<<<< Updated upstream
                                 </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
@@ -324,7 +323,6 @@
                                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
-<<<<<<< Updated upstream
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Building" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tKW-ey-Mt6">
                                                             <rect key="frame" x="18" y="55" width="263" height="21"/>
 =======
@@ -341,7 +339,6 @@
                                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
-<<<<<<< Updated upstream
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Availability Now" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5XF-Oi-Kp6">
                                                             <rect key="frame" x="121" y="78" width="145" height="21"/>
                                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
@@ -387,7 +384,6 @@
                                             </tableViewCell>
                                         </prototypes>
                                     </tableView>
-<<<<<<< Updated upstream
                                     <searchBar contentMode="redraw" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="IMZ-Aa-qZS">
                                         <rect key="frame" x="0.0" y="69" width="376" height="44"/>
                                         <textInputTraits key="textInputTraits"/>
