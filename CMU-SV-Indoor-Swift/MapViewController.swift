@@ -27,7 +27,7 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
     @IBOutlet weak var peopleSegment: UISegmentedControl!
     @IBOutlet weak var timeSegment: UISegmentedControl!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
-    @IBOutlet weak var roomButton: UIButton!
+    //@IBOutlet weak var roomButton: UIButton!
     var minimumTime: Int!
     var minimumPeople: Int!
     var openRooms: [PFObject]!
@@ -69,6 +69,8 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
     var currentFloor = Floor.Floor1
     var currentViewFloor = Floor.Floor1
     
+    
+    
     //LOCATION SEARCH
     @IBOutlet weak var modalView: UIView!
     
@@ -83,40 +85,23 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
     
     
     // MARK: Functional Methods
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        //ROOM SEARCH
-        roomScheduler.alpha = 0
-        minimumTime = 0  
-        minimumPeople = 0
-        openRooms = []
-        
-        var queryRooms = PFQuery(className: "rooms")
-        queryRooms.whereKey("isRoom", equalTo: true)
-        queryRooms.whereKey("Available_now", equalTo: 1)
-        queryRooms.orderByAscending("Room_Name")
-        queryRooms.findObjectsInBackgroundWithBlock { (rooms: [PFObject]?, error: NSError?) -> Void in
+
+    func showOpenRooms() {
+        print("running function : show open rooms")
+        var query = PFQuery(className: "rooms")
+        query.whereKey("isRoom", equalTo: true)
+        query.whereKey("Available_Duration", greaterThanOrEqualTo: minimumTime )
+        query.whereKey("Capacity", greaterThanOrEqualTo:minimumPeople)
+        query.orderByAscending("Room_Name")
+        query.findObjectsInBackgroundWithBlock { (openRooms: [PFObject]?, error: NSError?) -> Void in
             print("got the rooms")
-            print(rooms)
-            self.openRooms = rooms
+            print(openRooms)
+            self.openRooms = openRooms
             self.tableView.reloadData()
         }
-        
-        tableView.dataSource = self
-        tableView.delegate = self
-        openRoomsTable.estimatedRowHeight = 100
-        
-
-        
-        //END ROOM SEARCH
-        
-
-        //INITIALIZING LOCATION SEARCH
-
-        locations = []
-        
+    }
+    
+    func showLocations() {
         var query = PFQuery(className: "rooms")
         query.orderByAscending("Room_Name")
         query.findObjectsInBackgroundWithBlock { (locations: [PFObject]?, error: NSError?) -> Void in
@@ -125,7 +110,50 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
             self.locations = locations
             self.tableView.reloadData()
         }
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
         
+        //ROOM SEARCH
+        roomScheduler.alpha = 0
+        modalView.alpha = 0
+        minimumTime = 0  
+        minimumPeople = 0
+        openRooms = []
+        
+//        var queryRooms = PFQuery(className: "rooms")
+//        queryRooms.whereKey("isRoom", equalTo: true)
+//        queryRooms.whereKey("Available_now", equalTo: 1)
+//        queryRooms.orderByAscending("Room_Name")
+//        queryRooms.findObjectsInBackgroundWithBlock { (rooms: [PFObject]?, error: NSError?) -> Void in
+//            print("got the rooms")
+//            print(rooms)
+//            self.openRooms = rooms
+//            self.tableView.reloadData()
+//        }
+        showOpenRooms()
+        tableView.dataSource = self
+        tableView.delegate = self
+        openRoomsTable.estimatedRowHeight = 100
+        
+        
+        //END ROOM SEARCH
+        
+
+        //INITIALIZING LOCATION SEARCH
+
+        locations = []
+        
+//        var query = PFQuery(className: "rooms")
+//        query.orderByAscending("Room_Name")
+//        query.findObjectsInBackgroundWithBlock { (locations: [PFObject]?, error: NSError?) -> Void in
+//            print("got the locations")
+//            print(locations)
+//            self.locations = locations
+//            self.tableView.reloadData()
+//        }
+        showLocations()
 //        tableView.dataSource = self
 //        tableView.delegate = self
         tableView.estimatedRowHeight = 120
@@ -150,24 +178,28 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         print("checking number of rows")
-        if tableView == openRoomsTable {
-            return openRooms.count
+        if roomScheduler.alpha == 1 {
+            let tableView = openRoomsTable
             print("rooms.count = \(openRooms.count)")
+            return openRooms.count
+            
         } else {
-            return locations.count
             print("locations.count = \(locations.count)")
+            return locations.count
+            
         }
         
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
        
-        if tableView == openRoomsTable {
+        if roomScheduler.alpha == 1 {
+            //let tableView = openRoomsTable
             print("cell for row, table = rooms")
-            return setCopyInRoomFinderCell(indexPath)
+            return setCopyInRoomFinderCell(openRoomsTable, indexPath: indexPath)
         } else {
             print("cell for row, table = all locations")
-            return setCopyInLocationCell(indexPath)
+            return setCopyInLocationCell(tableView, indexPath: indexPath)
         }
         
         //this stuff below will be deleted
@@ -242,7 +274,7 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
     }
     
     //REFACTOR FOR LOCATION
-    func setCopyInLocationCell (indexPath: NSIndexPath) -> UITableViewCell {
+    func setCopyInLocationCell (tableView: UITableView, indexPath: NSIndexPath) -> UITableViewCell {
         
         var cell = tableView.dequeueReusableCellWithIdentifier("LocationResultsCell") as! LocationResultsCell
         
@@ -275,7 +307,7 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
         let isAvailable = location["Available_now"] as? Int
         let hasCapacity = location["Capacity"] as? Int
         
-        // Available_now: 1 = available, 0 = not available, -1 = not the kind of place you book (restroom, cafeteria, etc)
+        // Legend for Available_now: 1 = available, 0 = not available, -1 = not the kind of place you book (restroom, cafeteria, etc)
         
         if isRoom == true {
             cell.locationTypeImageView.image = UIImage(named: "room icon")
@@ -394,8 +426,7 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
     
     //START ROOM FINDER
     
-    @IBAction func peopleSegment(sender: UISegmentedControl) {
-       
+    @IBAction func peopleSegDidChange(sender: UISegmentedControl) {
         if peopleSegment.selectedSegmentIndex == 0 {
             minimumPeople = 4
         } else if peopleSegment.selectedSegmentIndex == 1 {
@@ -407,22 +438,23 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
         showOpenRooms()
     }
     
-    @IBAction func timeSegmentDidChange(sender: UISegmentedControl) {
-        
-        if timeSegment.selectedSegmentIndex == 0 {
-            minimumTime = 15
-        } else if timeSegment.selectedSegmentIndex == 1 {
-            minimumTime = 30
-        } else if timeSegment.selectedSegmentIndex == 2 {
-            minimumTime = 60
-        } else if timeSegment.selectedSegmentIndex == 3 {
-            minimumTime = 61
-        }
+   
+    @IBAction func timeSegDidChange(sender: UISegmentedControl) {
+        print("time segment index = \(timeSegment.selectedSegmentIndex)")
+            if timeSegment.selectedSegmentIndex == 0 {
+                minimumTime = 15
+            } else if timeSegment.selectedSegmentIndex == 1 {
+                minimumTime = 30
+            } else if timeSegment.selectedSegmentIndex == 2 {
+                minimumTime = 60
+            } else if timeSegment.selectedSegmentIndex == 3 {
+                minimumTime = 61
+            }
         print("changed time seg controller")
         showOpenRooms()
-        
     }
-    
+
+   
     
     @IBAction func didTapBackFromRoomFinder(sender: UIButton) {
         
@@ -434,10 +466,9 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
     }
     
    
-    func setCopyInRoomFinderCell(indexPath: NSIndexPath) -> UITableViewCell {
+    func setCopyInRoomFinderCell(tableView: UITableView, indexPath: NSIndexPath) -> UITableViewCell {
         
-        var cell = openRoomsTable.dequeueReusableCellWithIdentifier("RoomFinderCell") as! RoomFinderCell
-        
+        var cell = tableView.dequeueReusableCellWithIdentifier("RoomFinderCell") as! RoomFinderCell
         var openRoom = openRooms[indexPath.row]
         print("DQing openRoomsTable")
         
@@ -499,20 +530,20 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
     
     
     //function to reload search results
-    func showOpenRooms() {
-        print("running function : show open rooms")
-        var query = PFQuery(className: "rooms")
-        query.whereKey("isRoom", equalTo: true)
-        query.whereKey("Available_Duration", greaterThanOrEqualTo: minimumTime )
-        query.whereKey("Capacity", greaterThanOrEqualTo:minimumPeople)
-        query.orderByAscending("Room_Name")
-        query.findObjectsInBackgroundWithBlock { (openRooms: [PFObject]?, error: NSError?) -> Void in
-            print("got the rooms")
-            print(openRooms)
-            self.openRooms = openRooms
-            self.tableView.reloadData()
-        }
-    }
+//    func showOpenRooms() {
+//        print("running function : show open rooms")
+//        var query = PFQuery(className: "rooms")
+//        query.whereKey("isRoom", equalTo: true)
+//        query.whereKey("Available_Duration", greaterThanOrEqualTo: minimumTime )
+//        query.whereKey("Capacity", greaterThanOrEqualTo:minimumPeople)
+//        query.orderByAscending("Room_Name")
+//        query.findObjectsInBackgroundWithBlock { (openRooms: [PFObject]?, error: NSError?) -> Void in
+//            print("got the rooms")
+//            print(openRooms)
+//            self.openRooms = openRooms
+//            self.tableView.reloadData()
+//        }
+//    }
 
 
     //END ROOM FUNCTIONS
@@ -989,23 +1020,38 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
         //print("Tapped search button")
         //markerFromModal.map = nil;
         //marker.map = nil;
-        UIView.animateWithDuration(0.3, animations: {
-            self.modalView.alpha = 1
-            self.roomScheduler.alpha = 0
+        if modalView.alpha == 0 {
+            UIView.animateWithDuration(0.3, animations: {
+                self.modalView.alpha = 1
+                self.roomScheduler.alpha = 0
             
-        })
-        markerFromModal.opacity = 0
-
+            })
+            showLocations()
+        } else {
+            UIView.animateWithDuration(0.3, animations: {
+                self.modalView.alpha = 0
+            })
+        }
     }
     
         
     @IBAction func roomSchedulerBtn(sender: AnyObject) {
         
-        UIView.animateWithDuration(0.3, animations: {
-            self.modalView.alpha = 0
-            self.roomScheduler.alpha = 1
+        if roomScheduler.alpha == 0 {
+            UIView.animateWithDuration(0.3, animations: {
+                self.modalView.alpha = 0
+                self.roomScheduler.alpha = 1
             
-        })
+            })
+        
+            self.roomScheduler.alpha = 1
+            showOpenRooms()
+        } else {
+            UIView.animateWithDuration(0.3, animations: {
+                self.roomScheduler.alpha = 0
+                
+            })
+        }
 
         
     }
