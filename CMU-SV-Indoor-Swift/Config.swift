@@ -9,11 +9,11 @@
 import Foundation
 
 // MARK: IndoorAtlas API Keys and Secrets
-let INDOORATLAS_API_Key = "27e644ae-1855-454d-ab9c-80c512221361"
-let INDOORATLAS_SECRRET = "0NpTv4YzMqC)HAchRlvxbP5fIAFEg)k2X(4xpVog)7rrSiqsch%NmGYYhZBltaMiIsfdq3AWlTAOCkuWO6YH5TCxf7lDEBJnqyhj7YvMLGhV!3Mi8znqZeNI5INyjPQr"
+let INDOORATLAS_API_Key = ""
+let INDOORATLAS_SECRRET = ""
 
 //FLOORPLANID for 850 Cherry
-let BSB_1F_ID = "929b24c3-6902-435c-a505-d6bc0448c22a"
+let BSB_1F_ID = ""
 let B23_1F_ID = "6ba0ce2b-9a57-4d06-9dcf-c1a443c07376"
 let B23_2F_ID = "7e5f7360-21be-4076-90d2-4361d2612457"
 
