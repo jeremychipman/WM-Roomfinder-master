@@ -20,6 +20,7 @@ class RoomFinderCell: UITableViewCell {
     
     @IBOutlet weak var capacityLabel: UILabel!
     
+    @IBOutlet weak var distanceLabel: UILabel!
 //    @IBOutlet weak var cellButton: UIButton!
 
     

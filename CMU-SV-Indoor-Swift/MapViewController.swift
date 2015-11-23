@@ -70,7 +70,6 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
     var currentViewFloor = Floor.Floor1
     
     
-    
     //LOCATION SEARCH
     @IBOutlet weak var modalView: UIView!
     
@@ -86,19 +85,42 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
     
     // MARK: Functional Methods
 
+    func distanceBetweenPoints(userLocation: CLLocationCoordinate2D, foundLocation: AnyObject) -> Double {
+        
+        //returns the distance, in meters, between the user's current location and a parse coordinate
+        let userLocationCL = CLLocation(latitude: userLocation.latitude, longitude: userLocation.longitude)
+        let locationGeoPoint = (foundLocation as? PFGeoPoint)!
+        let longVar = locationGeoPoint.longitude as CLLocationDegrees!
+        let latVar = locationGeoPoint.latitude as CLLocationDegrees!
+
+        
+        print("Distance in meters: \(userLocationCL.distanceFromLocation(CLLocation(latitude: latVar, longitude: longVar)))")
+        
+        return userLocationCL.distanceFromLocation(CLLocation(latitude: latVar, longitude: longVar))
+    }
+
+    
     func showOpenRooms() {
         print("running function : show open rooms")
         var query = PFQuery(className: "rooms")
+//        should add query for building being the current building
+        // should we only check the current floor?
         query.whereKey("isRoom", equalTo: true)
         query.whereKey("Available_Duration", greaterThanOrEqualTo: minimumTime )
-        query.whereKey("Capacity", greaterThanOrEqualTo:minimumPeople)
+        query.whereKey("Capacity", greaterThanOrEqualTo: minimumPeople)
         query.orderByAscending("Room_Name")
+        //** sort by nearness: 
+//        probably need if statement to make sure we're getting a user location
+//        let userPFGeoPoint = (geoPointWithLatitude: <need var for userlat>, geoPointWithLongitude: <need var for userlong>) as PFGeoPoint
+//        query.whereKey("Long_Lat", nearGeoPoint: userPFGeoPoint)
         query.findObjectsInBackgroundWithBlock { (openRooms: [PFObject]?, error: NSError?) -> Void in
             print("got the rooms")
             print(openRooms)
             self.openRooms = openRooms
             self.tableView.reloadData()
         }
+//        somewhere, possible before previous call, we need to handle having 0 rooms in query
+//        we need to handle
     }
     
     func showLocations() {
@@ -121,20 +143,9 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
         minimumTime = 0  
         minimumPeople = 0
         openRooms = []
-        
-//        var queryRooms = PFQuery(className: "rooms")
-//        queryRooms.whereKey("isRoom", equalTo: true)
-//        queryRooms.whereKey("Available_now", equalTo: 1)
-//        queryRooms.orderByAscending("Room_Name")
-//        queryRooms.findObjectsInBackgroundWithBlock { (rooms: [PFObject]?, error: NSError?) -> Void in
-//            print("got the rooms")
-//            print(rooms)
-//            self.openRooms = rooms
-//            self.tableView.reloadData()
-//        }
-        showOpenRooms()
-        tableView.dataSource = self
-        tableView.delegate = self
+//        showOpenRooms()
+        openRoomsTable.dataSource = self
+        openRoomsTable.delegate = self
         openRoomsTable.estimatedRowHeight = 100
         
         
@@ -153,9 +164,9 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
 //            self.locations = locations
 //            self.tableView.reloadData()
 //        }
-        showLocations()
-//        tableView.dataSource = self
-//        tableView.delegate = self
+//        showLocations()
+        tableView.dataSource = self
+        tableView.delegate = self
         tableView.estimatedRowHeight = 120
         searchBar.delegate = self
         //END LOCATION SEARCH
@@ -178,7 +189,7 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         print("checking number of rows")
-        if roomScheduler.alpha == 1 {
+        if tableView == openRoomsTable {
             let tableView = openRoomsTable
             print("rooms.count = \(openRooms.count)")
             return openRooms.count
@@ -193,7 +204,7 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
        
-        if roomScheduler.alpha == 1 {
+        if tableView == openRoomsTable {
             //let tableView = openRoomsTable
             print("cell for row, table = rooms")
             return setCopyInRoomFinderCell(openRoomsTable, indexPath: indexPath)
@@ -282,26 +293,77 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
         
         cell.nameLabel.text = location["Room_Name"] as? String
         
+        var roomNumber: String!
+        var floorNumber: String!
+        var longAddress: String!
+        
+        
         
         let building = location["Building"] as? String
         
         if building == "SB850C" {
-            cell.buildingsAddressLabel.text = "850 Cherry Ave., SB"
+            longAddress = "850 Cherry Ave., SB"
         } else if building == "SB860E" {
-            cell.buildingsAddressLabel.text = "860 Elm Ave., SB"
+            longAddress = "860 Elm Ave., SB"
         } else if building == "SV850C" {
-            cell.buildingsAddressLabel.text = "850 W. California Ave., SV"
+            longAddress = "850 W. California Ave., SV"
         } else if building == "SV850C" {
-            cell.buildingsAddressLabel.text = "840 W. California Ave., SV"
+            longAddress = "840 W. California Ave., SV"
         }
         
         let onFloor = location["Floor"] as? Int
         if onFloor != nil {
-            cell.floorNumberLabel.text = "Floor: \(location["Floor"])"
+            if onFloor == 1 {
+                floorNumber = "\(location["Floor"])st floor"
+            } else if onFloor == 2 {
+                floorNumber = "\(location["Floor"])nd floor"
+            } else if onFloor == 3 {
+                floorNumber = "\(location["Floor"])rd floor"
+            } else {
+                floorNumber = "\(location["Floor"])th floor"
+            }
         } else if onFloor == nil {
-            cell.floorNumberLabel.text = "Floor unknown"
-            cell.floorNumberLabel.textColor = UIColor.lightGrayColor()
+            floorNumber = "Floor N/A"
         }
+        
+        if location["Room_Num"] != nil {
+            roomNumber = location["Room_Num"] as! String!
+        } else {
+            roomNumber = "Room N/A"
+        }
+        
+
+        cell.floorNumberLabel.text = "\(roomNumber): \(floorNumber), \(longAddress)"
+        
+        
+        
+        
+        
+//        if building == "SB850C" {
+//            cell.buildingsAddressLabel.text = "850 Cherry Ave., SB"
+//        } else if building == "SB860E" {
+//            cell.buildingsAddressLabel.text = "860 Elm Ave., SB"
+//        } else if building == "SV850C" {
+//            cell.buildingsAddressLabel.text = "850 W. California Ave., SV"
+//        } else if building == "SV850C" {
+//            cell.buildingsAddressLabel.text = "840 W. California Ave., SV"
+//        }
+//        
+//        let onFloor = location["Floor"] as? Int
+//        if onFloor != nil {
+//            if onFloor == 1 {
+//                cell.floorNumberLabel.text = "\(location["Floor"])st Floor, "
+//            } else if onFloor == 2 {
+//                cell.floorNumberLabel.text = "\(location["Floor"])nd Floor, "
+//            } else if onFloor == 3 {
+//                cell.floorNumberLabel.text = "\(location["Floor"])rd Floor, "
+//            } else {
+//                cell.floorNumberLabel.text = "\(location["Floor"])th Floor, "
+//            }
+//        } else if onFloor == nil {
+//            cell.floorNumberLabel.text = "Floor unknown"
+//            cell.floorNumberLabel.textColor = UIColor.lightGrayColor()
+//        }
         
         let isRoom = location["isRoom"] as! Bool
         let isAvailable = location["Available_now"] as? Int
@@ -342,14 +404,36 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
             cell.roomCapacityLabel.alpha = 0
         }
         
+//        //show distance to room/person
+//        if currentBuilding == building {
+//            print("destination is in this same building")
+//            if location["Long_Lat"] != nil {
+//                if currentIndoorCoordinate.longitude != 0 && currentIndoorCoordinate.longitude != 0 {
+//                    let distance = distanceBetweenPoints(currentIndoorCoordinate, foundLocation: location["Long_Lat"])
+//                    cell.distanceLabel.text = "\(distance) meters"
+//                } else if currentGPSCoordinate.longitude != 0 && currentGPSCoordinate.longitude != 0  {
+//                    let distance = distanceBetweenPoints(currentGPSCoordinate, foundLocation: location["Long_Lat"])
+//                    cell.distanceLabel.text = "\(distance) meters"
+//                } else {
+//                    cell.distanceLabel.text = "GPS error"
+//                }
+//            } else {
+//                cell.distanceLabel.text = "No location in DB"
+//            }
+//        } else {
+//            print("destination is not in this building")
+//            cell.distanceLabel.text = "No location in DB"
+//        }
+        
         return cell
-
+            
     }
     
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         var longVar: Double!
         var latVar: Double!
+        var locationGeoPoint: PFGeoPoint
         
         if tableView == openRoomsTable {
             locationFromModal = openRooms[indexPath.row]
@@ -357,24 +441,28 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
             locationFromModal = locations[indexPath.row]
         }
         
-        longVar = (locationFromModal["Long"] as? Double!)!
-        latVar = (locationFromModal["Lat"] as? Double!)!
+        locationGeoPoint = (locationFromModal["Long_Lat"] as? PFGeoPoint)!
+        longVar = locationGeoPoint.longitude
+        longVar = locationGeoPoint.latitude
+        
+        //        longVar = (locationFromModal["Long"] as? Double!)!
+        //        latVar = (locationFromModal["Lat"] as? Double!)!
         
         print("I clicked the row!!!")
         
         if longVar != nil && latVar != nil {
             //Dismiss keyboard on cell selection
             UIApplication.sharedApplication().sendAction("resignFirstResponder", to:nil, from:nil, forEvent:nil)
-        
+            
             //make modal disappear
             UIView.animateWithDuration(0.4, animations: {Void in
                 self.modalView.alpha = 0
                 self.roomScheduler.alpha = 0
             })
-
+            
             // This is the code to use if we were segueing between view controllers
             // self.performSegueWithIdentifier("seguetoMap" , sender: self)
-        
+            
             //Set a marker on the map at the selected room location
             markerFromModal.opacity = 1
             //markerFromModal.position = (locationFromModal["Long_Lat"] as? CLLocationCoordinate2D!)!
@@ -472,6 +560,9 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
         var openRoom = openRooms[indexPath.row]
         print("DQing openRoomsTable")
         
+//        functionality for distance from user's location
+//        if we have a user's location, then something like this: let meters = [newLocation distanceFromLocation:oldLocation] as! CLLocationDistance
+        
         cell.nameLabel.text = openRoom["Room_Name"] as? String
         
         
@@ -489,7 +580,15 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
         
         let onFloor = openRoom["Floor"] as? Int
         if onFloor != nil {
-            cell.floorLabel.text = "Floor: \(openRoom["Floor"])"
+            if onFloor == 1 {
+                cell.floorLabel.text = "\(openRoom["Floor"])st Floor, "
+            } else if onFloor == 2 {
+                cell.floorLabel.text = "\(openRoom["Floor"])nd Floor, "
+            } else if onFloor == 3 {
+                cell.floorLabel.text = "\(openRoom["Floor"])rd Floor, "
+            } else {
+                cell.floorLabel.text = "\(openRoom["Floor"])th Floor, "
+            }
         } else if onFloor == nil {
             cell.floorLabel.text = "Floor unknown"
             cell.floorLabel.textColor = UIColor.lightGrayColor()
@@ -522,6 +621,8 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
             cell.capacityLabel.alpha = 1
             
         }
+        
+      
         
         return cell
     }
@@ -1016,10 +1117,9 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
     }
     
     @IBAction func didTapSearchbutton(sender: AnyObject) {
+
+       //toolbar button toggles display of the modalView (room or person finder) view
         
-        //print("Tapped search button")
-        //markerFromModal.map = nil;
-        //marker.map = nil;
         if modalView.alpha == 0 {
             UIView.animateWithDuration(0.3, animations: {
                 self.modalView.alpha = 1
@@ -1027,6 +1127,7 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
             
             })
             showLocations()
+            
         } else {
             UIView.animateWithDuration(0.3, animations: {
                 self.modalView.alpha = 0
@@ -1036,25 +1137,24 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
     
         
     @IBAction func roomSchedulerBtn(sender: AnyObject) {
+
+        //toolbar button toggles display of the roomScheduler view
         
         if roomScheduler.alpha == 0 {
             UIView.animateWithDuration(0.3, animations: {
                 self.modalView.alpha = 0
                 self.roomScheduler.alpha = 1
-            
             })
-        
             self.roomScheduler.alpha = 1
             showOpenRooms()
         } else {
             UIView.animateWithDuration(0.3, animations: {
                 self.roomScheduler.alpha = 0
-                
             })
         }
-
-        
     }
+    
+    
  
 
 }
