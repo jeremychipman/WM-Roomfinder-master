@@ -117,7 +117,7 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
             print("got the rooms")
             print(openRooms)
             self.openRooms = openRooms
-            self.tableView.reloadData()
+            self.openRoomsTable.reloadData()
         }
 //        somewhere, possible before previous call, we need to handle having 0 rooms in query
 //        we need to handle
