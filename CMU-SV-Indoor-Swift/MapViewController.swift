@@ -212,77 +212,8 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
             print("cell for row, table = all locations")
             return setCopyInLocationCell(tableView, indexPath: indexPath)
         }
-        
-        //this stuff below will be deleted
-        
-//        var cell = tableView.dequeueReusableCellWithIdentifier("LocationResultsCell") as! LocationResultsCell
-//                
-//        var location = locations[indexPath.row]
-//        
-//        cell.nameLabel.text = location["Room_Name"] as? String
-//        
-//        
-//        let building = location["Building"] as? String
-//        
-//        if building == "SB850C" {
-//            cell.buildingsAddressLabel.text = "850 Cherry Ave., SB"
-//        } else if building == "SB860E" {
-//            cell.buildingsAddressLabel.text = "860 Elm Ave., SB"
-//        } else if building == "SV850C" {
-//            cell.buildingsAddressLabel.text = "850 W. California Ave., SV"
-//        } else if building == "SV850C" {
-//            cell.buildingsAddressLabel.text = "840 W. California Ave., SV"
-//        }
-//        
-//        let onFloor = location["Floor"] as? Int
-//        if onFloor != nil {
-//            cell.floorNumberLabel.text = "Floor: \(location["Floor"])"
-//        } else if onFloor == nil {
-//            cell.floorNumberLabel.text = "Floor unknown"
-//            cell.floorNumberLabel.textColor = UIColor.lightGrayColor()
-//        }
-//        
-//        let isRoom = location["isRoom"] as! Bool
-//        let isAvailable = location["Available_now"] as? Int
-//        let hasCapacity = location["Capacity"] as? Int
-//        
-//        // Available_now: 1 = available, 0 = not available, -1 = not the kind of place you book (restroom, cafeteria, etc)
-//        
-//        if isRoom == true {
-//            cell.locationTypeImageView.image = UIImage(named: "room icon")
-//            
-//            if isAvailable != nil && isAvailable == 1 {
-//                cell.roomAvailabilityLabel.text = "Available Now"
-//                cell.roomAvailabilityLabel.textColor = UIColor.greenColor()
-//                cell.roomAvailabilityLabel.alpha = 1
-//            } else if isAvailable != nil && isAvailable == 0 {
-//                cell.roomAvailabilityLabel.text = "Not Available"
-//                cell.roomAvailabilityLabel.textColor = UIColor.redColor()
-//                cell.roomAvailabilityLabel.alpha = 1
-//            } else if isAvailable != nil && isAvailable == -1 {
-//                cell.roomAvailabilityLabel.alpha = 0
-//            } else {
-//                cell.roomAvailabilityLabel.text = "Availability Unknown"
-//                cell.roomAvailabilityLabel.textColor = UIColor.grayColor()
-//            }
-//            
-//            cell.roomCapacityLabel.text = "Capacity: \(location["Capacity"])"
-//            cell.roomCapacityLabel.alpha = 1
-//            
-//        } else {  //if isRoom is false, then we're assuming it's a person. Could there be other types to capture? would we want to return the person's title, if available? any other data for people?
-//            cell.locationTypeImageView.image = UIImage(named: "person icon")
-//            if isAvailable == 0 {
-//                cell.roomAvailabilityLabel.text = "In a meeting"
-//                cell.roomAvailabilityLabel.textColor = UIColor.redColor()
-//                cell.roomAvailabilityLabel.alpha = 1
-//            } else {
-//                cell.roomAvailabilityLabel.alpha = 0
-//            }
-//            cell.roomCapacityLabel.alpha = 0
-//        }
-//        
-//        return cell
     }
+    
     
     //REFACTOR FOR LOCATION
     func setCopyInLocationCell (tableView: UITableView, indexPath: NSIndexPath) -> UITableViewCell {
@@ -329,16 +260,18 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
         if location["Room_Num"] != nil {
             roomNumber = location["Room_Num"] as! String!
         } else {
-            roomNumber = "Room N/A"
+            roomNumber = "(Room # N/A)"
         }
         
 
         cell.floorNumberLabel.text = "\(roomNumber): \(floorNumber), \(longAddress)"
+        cell.buildingsAddressLabel.text = ""
         
         
         
         
         
+//          The following was working code. This will need to be deleted once the replacement code (above) is vetted. Thje building address and floor used to be displayed in 3 different labels, but the above code places them all in one label to allow for sentence like structure.
 //        if building == "SB850C" {
 //            cell.buildingsAddressLabel.text = "850 Cherry Ave., SB"
 //        } else if building == "SB860E" {
@@ -395,6 +328,7 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
         } else {  //if isRoom is false, then we're assuming it's a person. Could there be other types to capture? would we want to return the person's title, if available? any other data for people?
             cell.locationTypeImageView.image = UIImage(named: "person icon")
             if isAvailable == 0 {
+                cell.roomAvailabilityLabel.frame.origin.x = 0
                 cell.roomAvailabilityLabel.text = "In a meeting"
                 cell.roomAvailabilityLabel.textColor = UIColor.redColor()
                 cell.roomAvailabilityLabel.alpha = 1
@@ -404,6 +338,12 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
             cell.roomCapacityLabel.alpha = 0
         }
         
+        
+        
+        print("User's Current Building: \(currentBuildingLabel.text)")
+        print("User's Current floor: \(currentFloor)")
+        currentFloor = Floor.Floor1
+
 //        //show distance to room/person
 //        if currentBuilding == building {
 //            print("destination is in this same building")
@@ -627,30 +567,11 @@ class MapViewController: UIViewController, UITableViewDataSource, UITableViewDel
         return cell
     }
     
-  
-    
-    
-    //function to reload search results
-//    func showOpenRooms() {
-//        print("running function : show open rooms")
-//        var query = PFQuery(className: "rooms")
-//        query.whereKey("isRoom", equalTo: true)
-//        query.whereKey("Available_Duration", greaterThanOrEqualTo: minimumTime )
-//        query.whereKey("Capacity", greaterThanOrEqualTo:minimumPeople)
-//        query.orderByAscending("Room_Name")
-//        query.findObjectsInBackgroundWithBlock { (openRooms: [PFObject]?, error: NSError?) -> Void in
-//            print("got the rooms")
-//            print(openRooms)
-//            self.openRooms = openRooms
-//            self.tableView.reloadData()
-//        }
-//    }
 
 
     //END ROOM FUNCTIONS
     
     
-   
     
     //START MAP STUFF
     private func initializeGoogleMapView() {
